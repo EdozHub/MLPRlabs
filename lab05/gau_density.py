@@ -66,4 +66,4 @@ if __name__ == "__main__":
     ll = loglikehood(X1D, mu_ML, C_ML)
     print(ll)
 
-#Commit per vedere se GitHub funziona
+#prova dal portatile
