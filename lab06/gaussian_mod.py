@@ -1,6 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+dic = {
+        'Iris-setosa': 0,
+        'Iris-versicolor': 1,
+        'Iris-virginica': 2
+    }
+
 def mrow(x):
     x = np.array(x)
     return x.reshape(1, x.shape[0])
@@ -10,11 +16,6 @@ def mcol(y):
     return y.reshape(y.shape[0], 1)
 
 def read_file(filename):
-    dic = {
-        'Iris-setosa': 0,
-        'Iris-versicolor': 1,
-        'Iris-virginica': 2
-    }
     Dlist = []
     Llist = []
     with open(filename, 'r') as f:
@@ -38,6 +39,21 @@ def split_db_2to1(D, L, seed=0):
     LTE = L[idxTest]
     return (DTR, LTR), (DTE, LTE)
 
+def compute_stats(D, L, label):
+    Dclass = D[:, L==label]
+    mu = np.mean(Dclass, axis=1).reshape(Dclass.shape[0], 1)
+    C = (Dclass - mu) @ (Dclass - mu).T / Dclass.shape[1]
+    return mu, C
+
+def compute_likelhood():
+    pass
+
+
 if __name__ == "__main__":
     data, labels= read_file('lab06/iris.csv')
     (DTR, LTR), (DTE, LTE) = split_db_2to1(data, labels, seed=0)
+    muSetosa, CSetosa = compute_stats(DTR, LTR, dic['Iris-setosa'])
+    muVersicolor, CVersicolor = compute_stats(DTR, LTR, dic['Iris-versicolor'])
+    muVirginica, CVirginica = compute_stats(DTR, LTR, dic['Iris-virginica'])
+    print("muVersicolor: ", muVersicolor)
+    print("CVersicolor: ", CVersicolor)
