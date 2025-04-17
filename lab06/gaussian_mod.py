@@ -59,6 +59,12 @@ def compute_likelhood(X, mu, C):
     ll = logGAU_ND(X, mu, C)
     return ll
 
+def compute_class_post_probability(score_matrix):
+    post_prob = np.zeros(score_matrix.shape)
+    for i in range(score_matrix.shape[0]):
+        post_prob[i] = 1/3 * np.exp(score_matrix[i])
+    return post_prob
+
 def compute_score_matrix(llsetosa, llversicolor, llvirginica):
     score = []
     score.append(llsetosa)
@@ -78,3 +84,4 @@ if __name__ == "__main__":
     llvirginica = compute_likelhood(DTR, muVirginica, CVirginica)
     score_matrix = compute_score_matrix(llsetosa, llversicolor, llvirginica)
     np.savetxt('lab06/score_output.csv', score_matrix.T, fmt='%.6f', delimiter=',', header='Setosa,Versicolor,Virginica', comments='')
+    post_prob = compute_class_post_probability(score_matrix)
