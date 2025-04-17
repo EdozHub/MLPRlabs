@@ -45,9 +45,27 @@ def compute_stats(D, L, label):
     C = (Dclass - mu) @ (Dclass - mu).T / Dclass.shape[1]
     return mu, C
 
-def compute_likelhood():
-    pass
+def logGAU_ND_singleSample(x, mu, C):
+    first_term = -mu.shape[0] / 2 * np.log(2*np.pi)
+    second_term = - 0.5 * np.linalg.slogdet(C)[1]
+    third_term = -0.5 * (x-mu).T @ np.linalg.inv(C) @ (x-mu)
+    return (first_term + second_term + third_term).ravel()
 
+def logGAU_ND(X, mu, C):
+    ll = [logGAU_ND_singleSample(X[:, i:i+1], mu, C) for i in range(X.shape[1])]
+    return np.array(ll).ravel()
+
+def compute_likelhood(X, mu, C):
+    ll = logGAU_ND(X, mu, C)
+    return ll
+
+def compute_score_matrix(llsetosa, llversicolor, llvirginica):
+    score = []
+    score.append(llsetosa)
+    score.append(llversicolor)
+    score.append(llvirginica)
+    score_matrix = np.array(score)
+    return score_matrix
 
 if __name__ == "__main__":
     data, labels= read_file('lab06/iris.csv')
@@ -55,5 +73,8 @@ if __name__ == "__main__":
     muSetosa, CSetosa = compute_stats(DTR, LTR, dic['Iris-setosa'])
     muVersicolor, CVersicolor = compute_stats(DTR, LTR, dic['Iris-versicolor'])
     muVirginica, CVirginica = compute_stats(DTR, LTR, dic['Iris-virginica'])
-    print("muVersicolor: ", muVersicolor)
-    print("CVersicolor: ", CVersicolor)
+    llsetosa = compute_likelhood(DTR, muSetosa, CSetosa)
+    llversicolor = compute_likelhood(DTR, muVersicolor, CVersicolor)
+    llvirginica = compute_likelhood(DTR, muVirginica, CVirginica)
+    score_matrix = compute_score_matrix(llsetosa, llversicolor, llvirginica)
+    np.savetxt('lab06/score_output.csv', score_matrix.T, fmt='%.6f', delimiter=',', header='Setosa,Versicolor,Virginica', comments='')
